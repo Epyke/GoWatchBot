@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
 
 const { REST, Routes } = require('discord.js');
 
@@ -134,4 +135,12 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 })
 
+http.createServer((req, res) => {
+    res.write('GoWatch is alive!');
+    res.end();
+}).listen(process.env.PORT || 8080, () => {
+    console.log('Le serveur de garde de Google Cloud est prêt !');
+});
+
 client.login(process.env.BOT_TOKEN);
+
