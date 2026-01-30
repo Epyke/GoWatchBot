@@ -123,29 +123,23 @@ client.once(Events.ClientReady, async () => {
     console.log(`Activity set to: ${activityType} ${activityName}`)
 });
 
-//Changer InteractionCreate -> interactionCreate
-
-client.on(Events.interactionCreate, async interaction => {
+client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
 
     const command = client.commands.get(interaction.commandName);
+    if (!command) return;
 
-    if(!command){
-        console.error(`No command matching ${interaction.commandName} was found`);
-        return;
-    }
-    
-    try{
+    try {
         await command.execute(interaction);
     } catch (error) {
         console.error(error);
         if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({content: `There was an error while executing this command`, ephemeral: true});
+            await interaction.followUp({ content: 'Erreur lors de l\'exécution !', ephemeral: true });
         } else {
-            await interaction.reply({content: `There was an error while executing this command`, ephemeral: true})
+            await interaction.reply({ content: 'Erreur lors de l\'exécution !', ephemeral: true });
         }
     }
-})
+});
 
 client.login(process.env.BOT_TOKEN);
 
