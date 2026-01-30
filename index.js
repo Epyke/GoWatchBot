@@ -1,5 +1,8 @@
 require('dotenv').config();
 
+const fs = require('fs');
+const path = require('path');
+
 const { REST, Routes } = require('discord.js');
 
 const deploycomands = async() => {
@@ -58,9 +61,6 @@ const client = new Client({
 
 client.commands = new Collection();
 
-const fs = require('fs');
-const path = require('path');
-
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
@@ -112,10 +112,10 @@ client.once(Events.ClientReady, async () => {
     console.log(`Activity set to: ${activityType} ${activityName}`)
 });
 
-client.on(Event.InteractionCreate, async interaction => {
+client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
 
-    const command = client.command.get(interaction.commandName);
+    const command = client.commands.get(interaction.commandName);
 
     if(!command){
         console.error(`No command matching ${interaction.commandName} was found`);
