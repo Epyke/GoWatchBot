@@ -123,7 +123,9 @@ client.once(Events.ClientReady, async () => {
     console.log(`Activity set to: ${activityType} ${activityName}`)
 });
 
-client.on(Events.InteractionCreate, async interaction => {
+//Changer InteractionCreate -> interactionCreate
+
+client.on(Events.interactionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
 
     const command = client.commands.get(interaction.commandName);
