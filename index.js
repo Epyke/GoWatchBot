@@ -6,6 +6,16 @@ const http = require('http');
 
 const { REST, Routes } = require('discord.js');
 
+const server = http.createServer((req, res) => {
+    res.writeHead(200);
+    res.end('GoWatch is Online!');
+});
+
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`Serveur de garde actif sur le port ${PORT}`);
+});
+
 const deploycomands = async() => {
     try{
         const commands = [];
@@ -122,7 +132,7 @@ client.on(Events.InteractionCreate, async interaction => {
         console.error(`No command matching ${interaction.commandName} was found`);
         return;
     }
-
+    
     try{
         await command.execute(interaction);
     } catch (error) {
