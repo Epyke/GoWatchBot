@@ -1,63 +1,54 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const { REST, Routes } = require('discord.js');
-
 const http = require('http');
-
-const { REST, Routes } = require('discord.js');
 
 const server = http.createServer((req, res) => {
     res.writeHead(200);
-    res.end('GoWatch is Online!');
+    res.end('GoWatchBot is Online!');
 });
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 10000;
 server.listen(PORT, '0.0.0.0', () => {
-    console.log(`Serveur de garde actif sur le port ${PORT}`);
+    console.log(`✅ Serveur de garde actif sur le port ${PORT}`);
 });
-
-
-const deployCommands = async () => {
-    try {
-        const commands = [];
-
-        const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
-
-        for (const file of commandFiles) {
-            const command = require(`./commands/${file}`);
-            if ('data' in command && 'execute' in command) {
-                commands.push(command.data.toJSON());
-            } else {
-                console.log(`WARNING: The command at ${file} is missing a required 'data' or 'execute' property.`);
-            }
-        }
-    
-
-    const rest = new REST().setToken(process.env.BOT_TOKEN);
-
-    console.log(`Started refreshing application slash commands globally.`);
-
-    const data = await rest.put(
-        Routes.applicationCommands(process.env.CLIENT_ID),
-        { body: commands },
-    );
-
-    console.log('Successfully reloaded all commands!');
-    } catch (error) {
-        console.error('Error deploying commands:', error)
-    }
-}
 
 const { 
+    REST, 
+    Routes, 
     Client, 
     GatewayIntentBits, 
     Partials, 
-    Collection,
-    ActivityType,
-    PresenceUpdateStatus,
-    Events
+    Collection, 
+    ActivityType, 
+    PresenceUpdateStatus, 
+    Events 
 } = require('discord.js');
+
+const deploycomands = async () => {
+    try {
+        const commands = [];
+        const commandsPath = path.join(__dirname, 'commands');
+        const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+        for (const file of commandFiles) {
+            const command = require(path.join(commandsPath, file));
+            if ('data' in command && 'execute' in command) {
+                commands.push(command.data.toJSON());
+            }
+        }
+
+        const rest = new REST().setToken(process.env.BOT_TOKEN);
+        console.log(`Rafraîchissement des ${commands.length} commandes...`);
+        await rest.put(
+            Routes.applicationCommands(process.env.CLIENT_ID),
+            { body: commands },
+        );
+        console.log('✅ Commandes slash rechargées avec succès !');
+    } catch (error) {
+        console.error('Erreur lors du déploiement :', error);
+    }
+};
 
 const client = new Client({
     intents: [
@@ -66,93 +57,46 @@ const client = new Client({
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMembers
     ],
-    partials: [
-        Partials.Channel,
-        Partials.Message,
-        Partials.User,
-        Partials.GuildMember
-    ]
+    partials: [Partials.Channel, Partials.Message, Partials.User, Partials.GuildMember]
 });
 
 client.commands = new Collection();
-
-
-
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const command = require(filePath);
-
+    const command = require(path.join(commandsPath, file));
     if ('data' in command && 'execute' in command) {
         client.commands.set(command.data.name, command);
-    } else {
-        console.log(`The Command ${filePath} is missing a required "data" or "execute" property.`)
     }
 }
 
 client.once(Events.ClientReady, async () => {
-    console.log(`Ready! Logged in as ${client.user.tag}`);
-
-    //Deploy Commands
-    await deployCommands();
-    console.log(`Commands deployed globally.`);
-
-    const statusType = process.env.BOT_STATUS || 'online';
-    const activityType = process.env.ACTIVITY_TYPE || 'PLAYING';
-    const activityName = process.env.ACTIVITY_NAME || 'Discord';
-
-    const activityTypeMap = {
-        'PLAYING': ActivityType.Playing,
-        'WATCHING': ActivityType.Watching,
-        'LISTENING': ActivityType.Listening,
-        'STREAMING': ActivityType.Streaming,
-        'COMPETING': ActivityType.Competing
-    };
-
-    const statusMap = {
-        'online': PresenceUpdateStatus.Online,
-        'idle': PresenceUpdateStatus.Idle,
-        'dnd': PresenceUpdateStatus.DoNotDisturb,
-        'invisible': PresenceUpdateStatus.Invisible
-    };
-
-    client.user.setPresence({
-        status: statusMap[statusType],
-        activities: [{
-            name: activityName,
-            type: activityTypeMap[activityType]
-        }]
-    });
+    console.log(`Prêt ! Connecté en tant que ${client.user.tag}`);
+    await deploycomands();
     
-    console.log(`Bot status set to: ${statusType}`);
-    console.log(`Activity set to: ${activityType} ${activityName}`)
+    client.user.setPresence({
+        status: PresenceUpdateStatus.Online,
+        activities: [{ name: 'Aider la famille', type: ActivityType.Playing }]
+    });
 });
 
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
 
     const command = client.commands.get(interaction.commandName);
-
-    if (!command) {
-        // console.error(`No command matching ${interaction.commandName} was found.`)
-        return;
-    }
+    if (!command) return;
 
     try {
         await command.execute(interaction);
     } catch (error) {
         console.error(error);
         if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true});
+            await interaction.followUp({ content: 'Une erreur est survenue !', ephemeral: true });
         } else {
-            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true});
+            await interaction.reply({ content: 'Une erreur est survenue !', ephemeral: true });
         }
     }
 });
 
-
 client.login(process.env.BOT_TOKEN);
-
-require('dotenv').config();
