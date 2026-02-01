@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { Client, IntentsBitField, ActivityType } = require("discord.js");
 const eventHandler = require("./handlers/eventHandler");
-
+const mongoose = require("mongoose");
 const roles = [
   {
     id: "1003731592675602452",
@@ -34,7 +34,17 @@ let status = [
   },
 ];
 
-eventHandler(client);
+(async () => {
+  try {
+    mongoose.set("strictQuery", false);
+    await mongoose.connect(process.env.MANGODB_URI);
+    console.log("Connecté a la base de donné");
+  } catch (error) {
+    console.error(error);
+  }
+
+  eventHandler(client);
+})();
 
 client.on("interactionCreate", async (interaction) => {
   try {

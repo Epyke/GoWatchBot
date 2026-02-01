@@ -28,7 +28,7 @@ module.exports = {
 
     if (targetUser.id === interaction.guild.ownerId) {
       await interaction.editReply(
-        "Vous ne pouvez pas bannir cet utilisateur puisque c'est le proprietaire du serveur.",
+        "Vous ne pouvez pas expulser cet utilisateur puisque c'est le proprietaire du serveur.",
       );
       return;
     }
@@ -39,22 +39,22 @@ module.exports = {
 
     if (targetUserRolePosition >= requestUserRolePosition) {
       await interaction.editReply(
-        "Vous ne pouvez pas bannir cet utilisateur car il a le même niveau de permissions que vous.",
+        "Vous ne pouvez pas expulser cet utilisateur car il a le même niveau de permissions que vous.",
       );
       return;
     }
 
     if (targetUserRolePosition >= botRolePosition) {
       await interaction.editReply(
-        "Je n'est pas les permissions requises pour bannir cet utilisateur.",
+        "Je n'est pas les permissions requises pour expulser cet utilisateur.",
       );
       return;
     }
 
     try {
-      await targetUser.ban({ reason });
+      await targetUser.kick({ reason });
       await interaction.editReply(
-        `L'utilisateur ${targetUser} a été éliminé, je m'en suis chargé.\nRaison: ${reason}`,
+        `L'utilisateur ${targetUser} a été officiellement renié de la famille.\nRaison: ${reason}`,
       );
     } catch (error) {
       console.error(error);
@@ -62,24 +62,24 @@ module.exports = {
   },
 
   deleted: true,
-  name: "ban",
-  description: "Bannis um membre du serveur",
+  name: "kick",
+  description: "Expulse um membre du serveur",
   // devOnly: Boolean,
   // testOnly: Boolean,
   options: [
     {
       name: "utilisateur",
-      description: "Utilisateur bannis.",
+      description: "Utilisateur expulsé.",
       required: true,
       type: ApplicationCommandOptionType.Mentionable,
     },
     {
       name: "raison",
-      description: "Raison du banissement.",
+      description: "Raison de l'expulsion.",
       type: ApplicationCommandOptionType.String,
     },
   ],
   deleted: false,
-  permissionsRequired: [PermissionFlagsBits.BanMembers],
-  botPermissions: [PermissionFlagsBits.BanMembers],
+  permissionsRequired: [PermissionFlagsBits.KickMembers],
+  botPermissions: [PermissionFlagsBits.KickMembers],
 };
