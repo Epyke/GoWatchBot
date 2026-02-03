@@ -1,4 +1,4 @@
-const { Client, Interaction } = require("discord.js");
+const { Client, Interaction, MessageFlags } = require("discord.js");
 
 const roles = [
   {
@@ -10,6 +10,7 @@ const roles = [
     label: "Sign the contract",
   },
 ];
+
 /**
  *
  * @param {Client} client
@@ -19,7 +20,7 @@ const roles = [
 module.exports = async (client, interaction) => {
   try {
     if (!interaction.isButton()) return;
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
     const role = interaction.guild.roles.cache.get(interaction.customId);
     if (!role) {
