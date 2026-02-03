@@ -18,6 +18,7 @@ const client = new Client({
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMembers,
     IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.GuildPresences,
     IntentsBitField.Flags.MessageContent,
   ],
 });
@@ -39,11 +40,13 @@ let status = [
     mongoose.set("strictQuery", false);
     await mongoose.connect(process.env.MANGODB_URI);
     console.log("Connecté a la base de donné");
+
+    eventHandler(client);
+
+    client.login(process.env.BOT_TOKEN);
   } catch (error) {
     console.error(error);
   }
-
-  eventHandler(client);
 })();
 
 client.on("interactionCreate", async (interaction) => {
@@ -90,5 +93,3 @@ client.on("interactionCreate", async (interaction) => {
     console.error(error);
   }
 });
-
-client.login(process.env.BOT_TOKEN);

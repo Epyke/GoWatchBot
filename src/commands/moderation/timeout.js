@@ -14,9 +14,9 @@ module.exports = {
    */
   callback: async (client, interaction) => {
     const mentionable = interaction.options.get("utilisateur").value;
-    const duration = interaction.options.get("duration").value;
+    const duration = interaction.options.get("duree").value;
     const reason =
-      interaction.options.get("reason")?.value || "Raison non mentionné";
+      interaction.options.get("raison")?.value || "Raison non mentionné";
 
     await interaction.deferReply();
 
@@ -33,7 +33,7 @@ module.exports = {
 
     const msDuration = ms(duration);
     if (isNaN(msDuration)) {
-      await InteractionWebhook.editReply("Entrez une valeur de durée valide.");
+      await interaction.editReply("Entrez une valeur de durée valide.");
       return;
     }
 
