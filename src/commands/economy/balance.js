@@ -6,7 +6,7 @@ const {
 const User = require("../../models/User");
 module.exports = {
   /**
-   *
+   * Wow
    * @param {Client} clientEncryption
    * @param {Interaction} interaction
    */
