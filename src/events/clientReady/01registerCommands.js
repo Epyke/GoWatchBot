@@ -48,6 +48,7 @@ module.exports = async (client) => {
       }
     }
   } catch (error) {
-    console.log(`There was an error: ${error}`);
+    console.error("❌ Erreur critique dans le Command Handler :");
+    console.error(error); // Ceci affichera le fichier et la ligne exacte
   }
 };

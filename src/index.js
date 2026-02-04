@@ -3,6 +3,9 @@ const { Client, IntentsBitField, ActivityType } = require("discord.js");
 const eventHandler = require("./handlers/eventHandler");
 const mongoose = require("mongoose");
 const deepl = require("deepl-node");
+
+const { startAnimeWorker } = require("./worker/animeWorker.js");
+
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
@@ -19,6 +22,8 @@ const client = new Client({
     await mongoose.connect(process.env.MANGODB_URI);
     client.deepl = new deepl.Translator(process.env.DEEPL_TOKEN);
     console.log("Connecté a la base de donné");
+
+    startAnimeWorker(client);
 
     eventHandler(client);
 
