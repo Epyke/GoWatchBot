@@ -6,7 +6,7 @@ const {
   ButtonStyle,
 } = require("discord.js");
 
-const { getLatestAnimeId } = require("../services/anilist.js");
+const { getLatestAnimeId } = require("../services/anilistSchedule.js");
 
 const scheduled = new Set();
 

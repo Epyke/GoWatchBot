@@ -7,7 +7,7 @@ const {
   MessageFlags,
 } = require("discord.js");
 const NotificationConfig = require("../../models/NotificationConfig");
-const { getLatestAnimeId } = require("../../services/anilist.js");
+const { getLatestAnimeId } = require("../../services/anilistSchedule.js");
 
 module.exports = {
   /**
