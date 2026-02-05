@@ -15,7 +15,7 @@ function getRandomXp(min, max) {
  * @param {Client} client
  * @param {Message} message
  */
-module.exports = async (client, message) => {
+module.exports = async (message, client) => {
   if (
     !message.inGuild() ||
     message.author.bot ||

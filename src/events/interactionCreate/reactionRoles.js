@@ -17,7 +17,7 @@ const roles = [
  * @param {Interaction} interaction
  * @returns
  */
-module.exports = async (client, interaction) => {
+module.exports = async (interaction, client) => {
   try {
     if (!interaction.isButton()) return;
 

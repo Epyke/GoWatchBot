@@ -1,20 +1,17 @@
+const { PermissionFlagsBits } = require("discord.js");
+
 module.exports = {
-  name: "ping",
-  description: "Verifie si le bot est vivant",
-  // devOnly: Boolean,
-  //testOnly: Boolean,
-  // options: Object[],
-  // deleted: Boolean,
-  deleted: false,
-  callback: async (client, interaction) => {
-    await interaction.deferReply();
+  data: {
+    name: "ping",
+    description: "Replies with the bot latency.",
+  },
 
-    const reply = await interaction.fetchReply();
+  run: async ({ interaction, client }) => {
+    await interaction.reply(`Pong! Latency is ${client.ws.ping}ms.`);
+  },
 
-    const ping = reply.createdTimestamp - interaction.createdTimestamp;
-
-    interaction.editReply(
-      `Pong! Client ${ping}ms | Websocket: ${client.ws.ping}ms`,
-    );
+  options: {
+    userPermissions: [PermissionFlagsBits.Administrator],
+    botPermissions: [PermissionFlagsBits.SendMessages],
   },
 };

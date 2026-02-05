@@ -1,36 +1,44 @@
 const {
-  Client,
-  Interaction,
   ApplicationCommandOptionType,
   PermissionFlagsBits,
 } = require("discord.js");
 
 module.exports = {
-  /**
-   *
-   * @param {Client} client
-   * @param {Interaction} interaction
-   */
+  data: {
+    name: "ban",
+    description: "Bans a member from the server.",
+    options: [
+      {
+        name: "target-user",
+        description: "The user to ban.",
+        type: ApplicationCommandOptionType.Mentionable,
+        required: true,
+      },
+      {
+        name: "reason",
+        description: "The reason for banning.",
+        type: ApplicationCommandOptionType.String,
+      },
+    ],
+  },
 
-  callback: async (client, interaction) => {
-    const targetUserId = interaction.options.get("utilisateur").value;
+  run: async ({ interaction }) => {
+    const targetUserId = interaction.options.get("target-user").value;
     const reason =
-      interaction.options.get("raison")?.value || "Raison non mentionné.";
+      interaction.options.get("reason")?.value || "No reason provided";
 
     await interaction.deferReply();
 
     const targetUser = await interaction.guild.members.fetch(targetUserId);
 
     if (!targetUser) {
-      await interaction.editReply("L'utilisateur n'est plus dans le serveur.");
-      return;
+      return interaction.editReply("That user doesn't exist in this server.");
     }
 
     if (targetUser.id === interaction.guild.ownerId) {
-      await interaction.editReply(
-        "Vous ne pouvez pas bannir cet utilisateur puisque c'est le proprietaire du serveur.",
+      return interaction.editReply(
+        "You can't ban that user because they're the server owner.",
       );
-      return;
     }
 
     const targetUserRolePosition = targetUser.roles.highest.position;
@@ -38,48 +46,29 @@ module.exports = {
     const botRolePosition = interaction.guild.members.me.roles.highest.position;
 
     if (targetUserRolePosition >= requestUserRolePosition) {
-      await interaction.editReply(
-        "Vous ne pouvez pas bannir cet utilisateur car il a le même niveau de permissions que vous.",
+      return interaction.editReply(
+        "You can't ban that user because they have the same/higher role than you.",
       );
-      return;
     }
 
     if (targetUserRolePosition >= botRolePosition) {
-      await interaction.editReply(
-        "Je n'est pas les permissions requises pour bannir cet utilisateur.",
+      return interaction.editReply(
+        "I can't ban that user because they have the same/higher role than me.",
       );
-      return;
     }
 
     try {
       await targetUser.ban({ reason });
       await interaction.editReply(
-        `L'utilisateur ${targetUser} a été éliminé, je m'en suis chargé.\nRaison: ${reason}`,
+        `User ${targetUser} was banned\nReason: ${reason}`,
       );
     } catch (error) {
-      console.error(error);
+      console.log(`There was an error when banning: ${error}`);
     }
   },
 
-  deleted: true,
-  name: "ban",
-  description: "Bannis um membre du serveur",
-  // devOnly: Boolean,
-  // testOnly: Boolean,
-  options: [
-    {
-      name: "utilisateur",
-      description: "Utilisateur bannis.",
-      required: true,
-      type: ApplicationCommandOptionType.Mentionable,
-    },
-    {
-      name: "raison",
-      description: "Raison du banissement.",
-      type: ApplicationCommandOptionType.String,
-    },
-  ],
-  deleted: false,
-  permissionsRequired: [PermissionFlagsBits.BanMembers],
-  botPermissions: [PermissionFlagsBits.BanMembers],
+  options: {
+    userPermissions: [PermissionFlagsBits.Administrator],
+    botPermissions: [PermissionFlagsBits.BanMembers],
+  },
 };

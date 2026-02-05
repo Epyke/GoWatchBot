@@ -6,7 +6,7 @@ const { Client, Interaction } = require("discord.js");
  * @param {Interaction} interaction
  * @returns
  */
-module.exports = async (client, interaction) => {
+module.exports = async (interaction, client) => {
   if (!interaction.isUserContextMenuCommand()) return;
 
   if (interaction.commandName === "User Information") {

@@ -1,6 +1,6 @@
 const { MessageFlags } = require("discord.js");
 
-module.exports = async (client, interaction) => {
+module.exports = async (interaction, client) => {
   if (!interaction.isButton()) return;
   if (interaction.customId !== "translate_desc") return false;
 

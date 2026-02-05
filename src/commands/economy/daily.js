@@ -1,60 +1,52 @@
-const { Client, Interaction } = require("discord.js");
+const { PermissionFlagsBits } = require("discord.js");
 const User = require("../../models/User");
 
-const dailyAmount = 1500;
+const dailyAmount = 1500; // Updated to match your snippet
 
 module.exports = {
-  name: "daily",
-  description: "Récupère ton argent quotidien.",
-  /**
-   *
-   * @param {Client} client
-   * @param {Interaction} interaction
-   */
-  callback: async (client, interaction) => {
-    if (!interaction.inGuild()) {
-      interaction.reply({
-        content: "Tu peux exécuter cette commande que dans un serveur.",
-        ephemeral: true,
-      });
-      return;
-    }
+  data: {
+    name: "daily",
+    description: "Claim your daily reward.",
+  },
 
-    try {
-      await interaction.deferReply();
+  run: async ({ interaction }) => {
+    await interaction.deferReply();
 
-      let query = {
-        userId: interaction.member.id,
-        guildId: interaction.guild.id,
-      };
+    let user = await User.findOne({
+      userId: interaction.user.id,
+      guildId: interaction.guildId,
+    });
 
-      let user = await User.findOne(query);
+    if (user) {
+      const lastDaily = user.lastDaily;
+      const now = new Date();
 
-      if (user) {
-        const lastDailyDate = user.lastDaily.toDateString();
-        const currentDate = new Date().toDateString();
-
-        if (lastDailyDate === currentDate) {
-          interaction.editReply(
-            "Tu as déjà empoché ton chèque quotidien. Reviens demain.",
-          );
-          return;
-        }
-      } else {
-        user = new User({
-          ...query,
-          lastDaily: new Date(),
-        });
-
-        user.balance += dailyAmount;
-        await user.save();
-
-        interaction.editReply(
-          `${dailyAmount}$ ont été ajouté a votre compte, vous avez ${user.balance}$ dans votre compte.`,
+      if (lastDaily && now - lastDaily < 86400000) {
+        return interaction.editReply(
+          "You have already claimed your daily reward today!",
         );
       }
-    } catch (error) {
-      console.error(`Error with /daily ${error}`);
+
+      user.balance += dailyAmount;
+      user.lastDaily = now;
+      await user.save();
+    } else {
+      user = new User({
+        userId: interaction.user.id,
+        guildId: interaction.guildId,
+        balance: dailyAmount,
+        lastDaily: new Date(),
+      });
+      await user.save();
     }
+
+    interaction.editReply(
+      `You have claimed **${dailyAmount}** coins! Your new balance is **${user.balance}** coins.`,
+    );
+  },
+
+  options: {
+    userPermissions: [PermissionFlagsBits.Administrator],
+    botPermissions: [PermissionFlagsBits.SendMessages],
   },
 };

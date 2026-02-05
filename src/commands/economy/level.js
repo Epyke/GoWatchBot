@@ -1,29 +1,31 @@
 const {
-  Client,
-  Interaction,
   ApplicationCommandOptionType,
   AttachmentBuilder,
+  PermissionFlagsBits,
 } = require("discord.js");
-
 const path = require("path");
 const canvacord = require("canvacord");
 const Level = require("../../models/Level");
 const calculateLevelXp = require("../../utils/calculateLevelXp");
-
 const background = path.join(__dirname, "../../assets/rankCard/moneyGun.jpg");
-
 const font = canvacord.Font.fromFile(
   path.join(__dirname, "../../assets/fonts/LEMONMILK-Bold.otf"),
   "LemonMilk",
 );
-
 module.exports = {
-  /**
-   *
-   * @param {Client} client
-   * @param {Interaction} interaction
-   */
-  callback: async (client, interaction) => {
+  data: {
+    name: "level",
+    description: "Check your or someone else's level.",
+    options: [
+      {
+        name: "user",
+        description: "The user to check the level of.",
+        type: ApplicationCommandOptionType.User,
+      },
+    ],
+  },
+
+  run: async ({ interaction }) => {
     if (!interaction.inGuild()) {
       interaction.reply(
         "Tu ne peux que utiliser cette commande dans un serveur",

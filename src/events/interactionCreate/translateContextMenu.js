@@ -28,7 +28,7 @@ const labels = {
  * @param {Client} client
  * @param {Interaction} interaction
  */
-module.exports = async (client, interaction) => {
+module.exports = async (interaction, client) => {
   if (!interaction.isMessageContextMenuCommand()) return;
 
   if (interaction.commandName === "Translate message") {

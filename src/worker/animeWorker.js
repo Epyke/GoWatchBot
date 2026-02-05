@@ -6,7 +6,7 @@ const {
   ButtonStyle,
 } = require("discord.js");
 
-const { getLatestAnimeId } = require("../services/anilistSchedule.js");
+const { getLatestAnimeId } = require("../services/AnilistSchedule.js");
 
 const scheduled = new Set();
 
@@ -26,19 +26,22 @@ async function syncDailySchedule(client) {
     return;
   }
 
-  const highRatedEpisodes = episodes.filter((ep) => ep.media.averageScore > 70);
+  const highRatedEpisodes = episodes.filter((ep) => ep.media.averageScore > 60);
 
   console.log(`\n=== HIGH RATED ANIME FOUND (${highRatedEpisodes.length}) ===`);
   highRatedEpisodes.forEach((ep) => {
     const title = ep.media.title.english || ep.media.title.romaji;
     // Formatage de la date de diffusion de l'épisode
-    const releaseDate = new Date(ep.airingAt * 1000).toLocaleString("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const releaseDate = new Date((ep.airingAt + 9000) * 1000).toLocaleString(
+      "fr-FR",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      },
+    );
     console.log(`📌 Anime: ${title}`);
     console.log(`   Release Date: ${releaseDate}`);
     console.log(`   Score: ${ep.media.averageScore}%`);
@@ -54,7 +57,7 @@ async function syncDailySchedule(client) {
   for (const ep of highRatedEpisodes) {
     if (scheduled.has(ep.id)) continue;
 
-    const delay = (ep.airingAt - now - 5) * 1000;
+    const delay = (ep.airingAt - now + 9000 - 5) * 1000;
 
     if (delay > 0) {
       scheduled.add(ep.id);
