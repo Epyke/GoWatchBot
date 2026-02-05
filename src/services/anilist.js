@@ -14,6 +14,7 @@ async function getLatestAnimeId() {
         timeUntilAiring
       media{
         id
+        bannerImage
         title {
           english
           romaji
@@ -27,7 +28,18 @@ async function getLatestAnimeId() {
         averageScore
         popularity
         rankings {
+          id
           rank
+          type
+          format
+          year
+          season
+          allTime
+          context
+        }
+        trailer{
+          id
+          site
         }
         favourites
         episodes
@@ -49,6 +61,8 @@ async function getLatestAnimeId() {
   }
 }`;
 
+  var queryTest = ``;
+
   const variables = {
     now: now,
     tomorrow: tomorrow,
@@ -67,20 +81,19 @@ async function getLatestAnimeId() {
       }),
     };
 
-  fetch(url, options).then(handleResponse).then(handleData).catch(handleError);
+  try {
+    const response = await fetch(url, options);
+    const json = await response.json();
 
-  function handleResponse(response) {
-    return response.json().then(function (json) {
-      return response.ok ? json : Promise.reject(json);
-    });
-  }
+    if (!response.ok) {
+      console.error("AniList API Error:", json);
+      return [];
+    }
 
-  function handleData(data) {
-    console.log(data);
-  }
-
-  function handleError(error) {
-    console.error(error);
+    return json.data.Page.airingSchedules || [];
+  } catch (error) {
+    console.error("Fetch Error:", error);
+    return [];
   }
 }
 

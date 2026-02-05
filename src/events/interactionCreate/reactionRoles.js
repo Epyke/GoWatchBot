@@ -20,6 +20,10 @@ const roles = [
 module.exports = async (client, interaction) => {
   try {
     if (!interaction.isButton()) return;
+
+    const roleIds = roles.map((r) => r.id);
+    if (!roleIds.includes(interaction.customId)) return;
+
     await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
     const role = interaction.guild.roles.cache.get(interaction.customId);
