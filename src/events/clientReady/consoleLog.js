@@ -1,5 +1,4 @@
 const { Client, ActivityType } = require("discord.js");
-const { startAnimeWorker } = require("../../worker/animeWorker.js");
 let status = [
   {
     name: "Aider la famille",
@@ -18,5 +17,4 @@ module.exports = (client) => {
     client.user.setActivity(status[random]);
   }, 150000);
   console.log(`${client.user.tag} est en ligne`);
-  startAnimeWorker(client);
 };
