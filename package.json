@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "axios": "^1.13.4",
     "canvacord": "^6.0.4",
     "commandkit": "^0.1.10",
     "deepl-node": "^1.24.0",

@@ -1,5 +1,6 @@
 const { Client, ActivityType } = require("discord.js");
 const { startAnimeWorker } = require("../../worker/animeWorker.js");
+const { checkPersonalReleases } = require("../../worker/personalTracker.js");
 let status = [
   {
     name: "Aider la famille",
@@ -19,4 +20,5 @@ module.exports = (client) => {
   }, 150000);
   console.log(`${client.user.tag} est en ligne`);
   startAnimeWorker();
+  checkPersonalReleases();
 };
