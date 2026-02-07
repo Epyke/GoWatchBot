@@ -1,5 +1,5 @@
 async function getLatestAnimeId() {
-  const now = Math.floor(Date.now() / 1000);
+  const now = Math.floor(Date.now() / 1000 - 2 * 60 * 60);
   const tomorrow = now + 86400;
 
   var query = `query ($now: Int, $tomorrow: Int) {
@@ -60,8 +60,6 @@ async function getLatestAnimeId() {
     }
   }
 }`;
-
-  var queryTest = ``;
 
   const variables = {
     now: now,
