@@ -23,7 +23,7 @@ async function checkPersonalReleases(client) {
   // 2. Définir la fenêtre de temps (Ce qui est sorti il y a entre 10 et 30 minutes)
   // Cela permet de ne pas rater d'épisode tout en évitant les doublons immédiats
   const now = Math.floor(Date.now() / 1000);
-  const windowStart = now - 604800;
+  const windowStart = now - 30 * 60;
   const windowEnd = now - 10 * 60;
 
   // 3. Requête GraphQL DÉTAILLÉE (Identique à votre animeWorker pour avoir toutes les infos)
@@ -88,18 +88,26 @@ async function checkPersonalReleases(client) {
             const user = await client.users.fetch(userSub.discordId);
 
             await user.send({
-              content: `🔔 **Nouvel épisode !** Vous suivez *${schedule.media.title.english || schedule.media.title.romaji}*.`,
+              content: `🔔 **Nouvel épisode !** Vous suivez *${schedule.media.title.romaji}*.`,
               embeds: messageData.embeds,
               components: messageData.components,
             });
 
-            console.log(
-              `[Perso] Notification envoyée à ${user.tag} pour ${schedule.media.title.english || schedule.media.title.romaji}`,
-            );
+            console.log(`[Perso] ✅ Notification envoyée à ${user.tag}`);
           } catch (err) {
-            console.error(
-              `[Perso] Impossible d'envoyer DM à ${userSub.discordId} (Bloqué ?)`,
-            );
+            // LOG DÉTAILLÉ DE L'ERREUR
+            console.error(`[Perso] ❌ Échec pour ${userSub.discordId}:`);
+            console.error(`   Code: ${err.code}`);
+            console.error(`   Message: ${err.message}`);
+
+            if (err.code === 50007)
+              console.error(
+                "   -> RAISON: L'utilisateur a fermé ses DMs ou bloqué le bot.",
+              );
+            if (err.code === 50001)
+              console.error(
+                "   -> RAISON: Le bot n'a pas la permission (Intents manquants sur le portail dev ?)",
+              );
           }
         }
       }

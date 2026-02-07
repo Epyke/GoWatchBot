@@ -19,6 +19,6 @@ module.exports = (client) => {
     client.user.setActivity(status[random]);
   }, 150000);
   console.log(`${client.user.tag} est en ligne`);
-  startAnimeWorker();
-  checkPersonalReleases();
+  startAnimeWorker(client);
+  checkPersonalReleases(client);
 };
