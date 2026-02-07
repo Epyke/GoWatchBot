@@ -5,6 +5,7 @@ const {
 } = require("discord.js");
 const Subscribe = require("../../models/UserSubscription");
 const axios = require("axios");
+const { resolveMalIdsToAnilist } = require("../../services/idMapper");
 
 // Tracking des tracking MAL
 const MAL_CLIENT_ID = process.env.MAL_CLIENT_ID;
@@ -109,42 +110,8 @@ async function run({ interaction, client, handler }) {
       "❌ Une erreur est survenue lors de la connexion à MyAnimeList.",
     );
   }
-}
 
-// Helper: Convertit les IDs MAL en IDs AniList par lots
-async function resolveMalIdsToAnilist(malAnimeIds, malMangaIds) {
-  if (malAnimeIds.length === 0 && malMangaIds.length === 0)
-    return { anime: [], manga: [] };
-
-  // On coupe pour ne pas surcharger (max 50 pour l'exemple, idéalement il faudrait paginer si > 50)
-  const vars = {
-    malAnime: malAnimeIds.slice(0, 50),
-    malManga: malMangaIds.slice(0, 50),
-  };
-
-  const query = `
-    query ($malAnime: [Int], $malManga: [Int]) {
-        anime: Page(perPage: 50) { media(idMal_in: $malAnime, type: ANIME) { id } }
-        manga: Page(perPage: 50) { media(idMal_in: $malManga, type: MANGA) { id } }
-    }`;
-
-  try {
-    const res = await axios.post("https://graphql.anilist.co", {
-      query,
-      variables: vars,
-    });
-    return {
-      anime: res.data.data.anime
-        ? res.data.data.anime.media.map((m) => m.id)
-        : [],
-      manga: res.data.data.manga
-        ? res.data.data.manga.media.map((m) => m.id)
-        : [],
-    };
-  } catch (e) {
-    console.error("Erreur conversion GraphQL:", e.message);
-    return { anime: [], manga: [] };
-  }
+  resolveMalIdsToAnilist();
 }
 
 module.exports = { data, run };

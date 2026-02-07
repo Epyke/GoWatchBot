@@ -1,6 +1,7 @@
 const { Client, ActivityType } = require("discord.js");
 const { startAnimeWorker } = require("../../worker/animeWorker.js");
 const { checkPersonalReleases } = require("../../worker/personalTracker.js");
+const { syncAllUserLists } = require("../../worker/syncWorker");
 let status = [
   {
     name: "Aider la famille",
@@ -21,4 +22,10 @@ module.exports = (client) => {
   console.log(`${client.user.tag} est en ligne`);
   startAnimeWorker(client);
   checkPersonalReleases(client);
+  setInterval(
+    () => {
+      syncAllUserLists(c);
+    },
+    60 * 60 * 1000,
+  );
 };
